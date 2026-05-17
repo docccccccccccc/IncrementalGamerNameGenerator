@@ -6,7 +6,7 @@ import PageLink from '@/components/PageLink.vue'
 
 <template>
   <PageLayout>
-    <template #header>增量游戏玩家名字生成器</template>
+    <template #header>增量玩家名字生成器</template>
     <el-row :gutter="32">
       <el-col :span="8">
         <RouterLink to="/cel">
