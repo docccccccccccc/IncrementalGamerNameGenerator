@@ -11,11 +11,11 @@
     <el-footer height="auto">
       <p>Made by <el-link href="https://doctypehtml.top">doctypehtml</el-link></p>
       <p>
-        GitHub Profile:
+        作者 GitHub 主页：
         <el-link href="https://github.com/docccccccccccc">docccccccccccc (doctypehtml)</el-link>
       </p>
       <p>
-        GitHub repository for this project:
+        项目 GitHub 仓库:
         <el-link href="https://github.com/docccccccccccc/IncrementalGamerNameGenerator">
           docccccccccccc/IncremetalGamerNameGenerator
         </el-link>

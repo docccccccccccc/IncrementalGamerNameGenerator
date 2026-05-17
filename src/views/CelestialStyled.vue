@@ -4,7 +4,7 @@ import PageLayout from '@/components/PageLayout.vue'
 
 <template>
   <PageLayout>
-    <template #header>"..., the Celestial of ..." 式</template>
+    <template #header>“..., the Celestial of ...” 式名字</template>
     <span>名字样式 1</span>
   </PageLayout>
 </template>
