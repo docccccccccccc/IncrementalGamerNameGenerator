@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header>
+    <el-header height="auto">
       <h1>
         <slot name="header"></slot>
       </h1>
@@ -8,7 +8,7 @@
     <el-main>
       <slot></slot>
     </el-main>
-    <el-footer>
+    <el-footer height="auto">
       <p>Made by <el-link href="https://doctypehtml.top">doctypehtml</el-link></p>
       <p>
         GitHub Profile:
