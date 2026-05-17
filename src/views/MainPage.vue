@@ -19,7 +19,7 @@ import PageLink from '@/components/PageLink.vue'
         </RouterLink>
       </el-col>
       <el-col :span="8">
-        <RouterLink to="/cel">
+        <RouterLink to="/about">
           <PageLink page-name="关于本项目" img-src="/images/logo.png" />
         </RouterLink>
       </el-col>

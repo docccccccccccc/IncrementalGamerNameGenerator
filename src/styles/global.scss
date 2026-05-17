@@ -14,7 +14,8 @@ body {
   display: none;
 }
 
-html {
+html,
+[class^='el-'] {
   font-family: var(--global-font-family);
 }
 
