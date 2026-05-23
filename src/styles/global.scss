@@ -4,14 +4,18 @@ body {
   font-family: var(--global-font-family);
   padding: 0;
   margin: 0;
-  height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  overflow: scroll;
 }
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+html {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100svh;
 }
 
 html,

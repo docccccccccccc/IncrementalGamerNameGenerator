@@ -13,6 +13,7 @@ defineProps<{
       justifyContent: 'center',
     }"
     shadow="hover"
+    class="page-link"
   >
     <div class="link-card-main">
       <el-image :src="imgSrc">
@@ -30,7 +31,7 @@ defineProps<{
 </template>
 
 <style lang="scss" scoped>
-.el-card {
+.page-link {
   height: 480px;
 }
 
@@ -41,7 +42,7 @@ defineProps<{
 }
 
 .page-name {
-  font-size: 32px;
+  font-size: 1.5em;
 }
 
 .link-card-main {
@@ -49,5 +50,12 @@ defineProps<{
   gap: 16px;
   flex-direction: column;
   align-items: center;
+  white-space: pre-line;
+}
+
+@media screen and (max-width: 80vh) {
+  .page-link {
+    height: 320px;
+  }
 }
 </style>
