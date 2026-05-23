@@ -58,10 +58,6 @@ const checkCustomizedText = (rule: any, value: string, callback: any) => {
 }
 
 const checkCustomizedNum = (rule: any, value: string, callback: any) => {
-  if (!value) {
-    callback(new Error('此处不能为空'))
-  }
-
   function isNumberChar(char: string) {
     const charCode = char.charCodeAt(0)
     return charCode >= 48 && charCode <= 57
@@ -71,8 +67,8 @@ const checkCustomizedNum = (rule: any, value: string, callback: any) => {
     callback(new Error('输入的内容不是数字（或者你输入了其他的数字字符）'))
   }
 
-  if (!(value.length === 3)) {
-    callback(new Error('输入的内容必须为 3 个字符'))
+  if (!(value.length === 3) && !(value.length === 0)) {
+    callback(new Error('输入的内容必须为 3 个字符，或者留空'))
   }
 }
 
@@ -101,6 +97,49 @@ const nameStylePreview = computed(() => {
 
   return beforeE + 'e' + afterE
 })
+
+const nameResult = ref<string>('[无]')
+
+const triggerGeneration = () => {
+  function generateBeforeE(): string {
+    let result: string = ''
+    for (let i = 0; i < 3; i++) {
+      // wtf
+      // Get cases for every characters
+      const uppercase = nameOptionsFormValue.beforeE.uppercase
+      // Then convert to boolean
+      const useUppercase: boolean[] = [
+        uppercase.includes('A'),
+        uppercase.includes('B'),
+        uppercase.includes('C'),
+      ]
+      result += useUppercase[i]
+        ? String.fromCharCode(Math.floor(65 + Math.random() * 26))
+        : String.fromCharCode(Math.floor(97 + Math.random() * 26))
+    }
+    return result
+  }
+
+  function generateAfterE(): string {
+    let result: string = ''
+    for (let i = 0; i < 3; i++) {
+      result += String.fromCharCode(Math.floor(48 + Math.random() * 10))
+    }
+    return result
+  }
+
+  const beforeE = nameOptionsFormValue.beforeE.limited
+    ? generateBeforeE()
+    : nameOptionsFormValue.beforeE.customizedText
+
+  const afterE = !nameOptionsFormValue.afterE.limited
+    ? nameOptionsFormValue.afterE.customizedNum === ''
+      ? generateAfterE() // Random generate if empty
+      : nameOptionsFormValue.afterE.customizedNum
+    : '308'
+
+  nameResult.value = beforeE + 'e' + afterE
+}
 </script>
 
 <template>
@@ -110,10 +149,19 @@ const nameStylePreview = computed(() => {
       "...e308" 式名字
     </template>
     <el-card>
-      <h2>名字选项</h2>
-      <h3>样式预览</h3>
-      <p class="name-style-preview">{{ nameStylePreview }}</p>
+      <el-row>
+        <el-col :span="12">
+          <h3>样式预览</h3>
+          <p class="name-style-preview">{{ nameStylePreview }}</p>
+        </el-col>
+        <el-col :span="12">
+          <h3>结果</h3>
+          <p class="name-result">{{ nameResult }}</p>
+          <el-button type="primary" @click="triggerGeneration()">生成</el-button>
+        </el-col>
+      </el-row>
       <el-divider />
+      <h2>名字选项</h2>
       <el-form
         :model="nameOptionsFormValue"
         :ref="nameOptionsFormRef"
@@ -164,11 +212,11 @@ const nameStylePreview = computed(() => {
         <!-- Then AfterE -->
         <!-- Unlimited only -->
         <el-form-item
-          label="e 后部分（仅允许 000 - 999）内的 3 位数字"
+          label="e 后部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
           prop="afterE.customizedNum"
           v-if="!nameOptionsFormValue.afterE.limited"
         >
-          <el-input v-model="nameOptionsFormValue.afterE.customizedNum" />
+          <el-input v-model="nameOptionsFormValue.afterE.customizedNum" placeholder="随机生成" />
         </el-form-item>
       </el-form>
     </el-card>
