@@ -1,7 +1,18 @@
+<script setup lang="ts">
+import { useDark, useToggle } from '@vueuse/core'
+
+const isDark = useDark()
+
+const toggleDark = useToggle(isDark)
+</script>
+
 <template>
   <el-container>
     <el-header height="auto">
       <h1>
+        <el-button size="large" @click="toggleDark()"
+          >切换为{{ isDark ? '浅色' : '深色' }}模式</el-button
+        >
         <slot name="header"></slot>
       </h1>
     </el-header>

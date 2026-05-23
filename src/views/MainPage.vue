@@ -19,7 +19,6 @@ onUnmounted(() => {
 })
 
 const direction = computed(() => {
-  console.log(useVerticalLayout.value)
   return useVerticalLayout.value ? 'vertical' : 'horizontal'
 })
 </script>
