@@ -5,6 +5,7 @@ body {
   padding: 0;
   margin: 0;
   overflow: scroll;
+  width: min(1200px, 100svw);
 }
 
 ::-webkit-scrollbar {
@@ -16,6 +17,7 @@ html {
   flex-direction: column;
   justify-content: center;
   height: 100svh;
+  align-items: center;
 }
 
 html,
