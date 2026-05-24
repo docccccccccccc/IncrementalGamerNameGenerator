@@ -65,11 +65,12 @@ incremental-gamer-name-generator/
 ├─ README.md          README（你正在看的）
 ├─ src/               源代码
 │  ├─ App.vue         根组件
-│  ├─ components      页面内组件
-│  ├─ main.ts         项目入口文件
-│  ├─ router          路由
-│  ├─ styles          页面样式
-│  └─ views           子页面
+│  ├─ components/     页面内组件
+│  ├─ main.ts/        项目入口文件
+│  ├─ router/         路由
+│  ├─ utils/          小功能
+│  ├─ styles/         页面样式
+│  └─ views/          子页面
 ├─ tsconfig.app.json  TypeScript 配置
 ├─ tsconfig.json      TypeScript 配置
 ├─ tsconfig.node.json TypeScript 配置
