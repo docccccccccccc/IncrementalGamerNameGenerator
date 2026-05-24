@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import obfuscatorPlugin from 'vite-plugin-obfuscator'
+import obfuscatorPlugin from 'vite-plugin-obfuscator-ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,16 +12,16 @@ export default defineConfig({
     vueDevTools(),
     process.env.NODE_ENV === 'production' &&
       obfuscatorPlugin({
-        include: [/\.js$/, /\.ts$/, /\.vue$/],
+        // include: [/\.js$/, /\.ts$/, /\.vue$/],
         exclude: ['node_modules/**'],
-        options: {
+        obfuscatorOptions: {
           // Basic compression
           compact: true, // Remove space
           simplify: true,
 
           // Core protect
           stringArray: true,
-          stringArrayEncoding: ['base64'], // Endoce string
+          stringArrayEncoding: ['base64'], // Encode string
           stringArrayThreshold: 0.8, // 80%
 
           numbersToExpressions: true,
