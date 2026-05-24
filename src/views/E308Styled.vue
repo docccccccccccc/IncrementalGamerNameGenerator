@@ -39,23 +39,25 @@ const checkCustomizedText = (rule: any, value: string, callback: any) => {
   // If value is empty
   if (!value) {
     callback(new Error('此处不能为空'))
-  }
+  } else {
+    function isEnglishLetter(char: string) {
+      // I can't memorize ASCII well so far
+      const charCode = char.charCodeAt(0)
+      const isUppercase = charCode >= 65 && charCode <= 90
+      const isLowercase = charCode >= 97 && charCode <= 122
+      return isUppercase || isLowercase
+    }
 
-  function isEnglishLetter(char: string) {
-    // I can't memorize ASCII well so far
-    const charCode = char.charCodeAt(0)
-    const isUppercase = charCode >= 65 && charCode <= 90
-    const isLowercase = charCode >= 97 && charCode <= 122
-    return isUppercase || isLowercase
-  }
+    // English letter
+    if (!value.split('').every((char: string) => isEnglishLetter(char))) {
+      callback(new Error('输入的内容不是英文字母'))
+    }
 
-  // English letter
-  if (!value.split('').every((char: string) => isEnglishLetter(char))) {
-    callback(new Error('输入的内容不是英文字母'))
-  }
+    if (!(value.length === 3)) {
+      callback(new Error('输入的内容必须为 3 个字符'))
+    }
 
-  if (!(value.length === 3)) {
-    callback(new Error('输入的内容必须为 3 个字符'))
+    callback()
   }
 }
 
@@ -67,10 +69,10 @@ const checkCustomizedNum = (rule: any, value: string, callback: any) => {
 
   if (!value.split('').every((char: string) => isNumberChar(char))) {
     callback(new Error('输入的内容不是数字（或者你输入了其他的数字字符）'))
-  }
-
-  if (!(value.length === 3) && !(value.length === 0)) {
+  } else if (!(value.length === 3) && !(value.length === 0)) {
     callback(new Error('输入的内容必须为 3 个字符，或者留空'))
+  } else {
+    callback()
   }
 }
 
@@ -140,11 +142,11 @@ const triggerGeneration = () => {
       ? generateBeforeE()
       : nameOptionsFormValue.beforeE.customizedText
 
-    const afterE = !nameOptionsFormValue.afterE.limited
-      ? nameOptionsFormValue.afterE.customizedNum === ''
+    const afterE = nameOptionsFormValue.afterE.limited
+      ? '308'
+      : nameOptionsFormValue.afterE.customizedNum === ''
         ? generateAfterE() // Random generate if empty
         : nameOptionsFormValue.afterE.customizedNum
-      : '308'
 
     nameResult.value.push(beforeE + 'e' + afterE)
   }
@@ -165,12 +167,12 @@ const generationIsRandom = computed(() => {
 const handleGenerateButtonClick = async (nameOptionsFormEl: FormInstance | undefined) => {
   if (!nameOptionsFormEl) return
   try {
-    if (await nameOptionsFormEl.validate()) {
-      triggerGeneration()
-    }
+    await nameOptionsFormEl.validate()
+    triggerGeneration()
   } catch (e) {
+    console.error(e)
     ElMessage({
-      message: (e as Error).message,
+      message: '请检查选项内容后重试',
       type: 'error',
     })
   }
@@ -230,7 +232,6 @@ const handleCopyNames = async () => {
         <!-- Limited -->
         <el-form-item
           label="e 前部分字母大小写选项（单击某一位置以在该位置启用大写）"
-          prop="beforeE.uppercase"
           v-if="nameOptionsFormValue.beforeE.limited"
         >
           <el-checkbox-group v-model="nameOptionsFormValue.beforeE.uppercase">
@@ -259,7 +260,7 @@ const handleCopyNames = async () => {
         </el-form-item>
 
         <!-- Bulk -->
-        <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）" prop="bulk">
+        <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）">
           <el-slider
             v-model="nameOptionsFormValue.bulk"
             :min="1"
