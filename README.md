@@ -1,7 +1,6 @@
-<h1 style="text-align: center">
+<h1 align="center">
   <img src="./logos/logo.png" width="144px" alt="增量玩家名字生成器 Logo" />
   <div>增量玩家名字生成器</div>
-  
 </h1>
 
 ![Version](https://img.shields.io/static/v1?label=Version&message=0.1.0&color=blue)
@@ -19,7 +18,7 @@
 
 ## 应用链接
 
-待定
+[https://doclove2generatename.netlify.app/#/](https://doclove2generatename.netlify.app/#/)
 
 ## 做点贡献
 
