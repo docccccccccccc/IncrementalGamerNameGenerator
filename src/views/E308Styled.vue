@@ -277,7 +277,12 @@ const handleCopyNames = async () => {
       <div>
         <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
         <div>
-          <el-space wrap>
+          <el-space
+            wrap
+            :style="{
+              justifyContent: 'center',
+            }"
+          >
             <span v-for="name in nameResult" :key="name">{{ name }}</span>
           </el-space>
         </div>
