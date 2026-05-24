@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import PageLayout from '@/components/PageLayout.vue'
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { initAntiDebug, destroyAntiDebug } from '@/utils/antiDebug'
+onMounted(() => {
+  initAntiDebug()
+})
+
+onUnmounted(() => {
+  destroyAntiDebug()
+})
 
 const router = useRouter()
 
