@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageLayout from '@/components/PageLayout.vue'
-import { type FormRules, type FormInstance } from 'element-plus'
+import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -16,6 +16,7 @@ interface nameOptionsForm {
     limited: boolean
     customizedNum: string // For leading 0 =)
   }
+  bulk: number
 }
 
 const nameOptionsFormValue = reactive<nameOptionsForm>({
@@ -28,6 +29,7 @@ const nameOptionsFormValue = reactive<nameOptionsForm>({
     limited: true,
     customizedNum: '308',
   },
+  bulk: 1,
 })
 
 const nameOptionsFormRef = ref<FormInstance>()
@@ -98,9 +100,12 @@ const nameStylePreview = computed(() => {
   return beforeE + 'e' + afterE
 })
 
-const nameResult = ref<string>('[无]')
+const nameResult = ref<string[]>(['[无]'])
+
+const nameIsGenerated = ref<boolean>(false)
 
 const triggerGeneration = () => {
+  nameResult.value = []
   function generateBeforeE(): string {
     let result: string = ''
     for (let i = 0; i < 3; i++) {
@@ -128,17 +133,62 @@ const triggerGeneration = () => {
     return result
   }
 
-  const beforeE = nameOptionsFormValue.beforeE.limited
-    ? generateBeforeE()
-    : nameOptionsFormValue.beforeE.customizedText
+  const nameAmount = generationIsRandom.value ? nameOptionsFormValue.bulk : 1
 
-  const afterE = !nameOptionsFormValue.afterE.limited
-    ? nameOptionsFormValue.afterE.customizedNum === ''
-      ? generateAfterE() // Random generate if empty
-      : nameOptionsFormValue.afterE.customizedNum
-    : '308'
+  for (let i = 0; i < nameAmount; i++) {
+    const beforeE = nameOptionsFormValue.beforeE.limited
+      ? generateBeforeE()
+      : nameOptionsFormValue.beforeE.customizedText
 
-  nameResult.value = beforeE + 'e' + afterE
+    const afterE = !nameOptionsFormValue.afterE.limited
+      ? nameOptionsFormValue.afterE.customizedNum === ''
+        ? generateAfterE() // Random generate if empty
+        : nameOptionsFormValue.afterE.customizedNum
+      : '308'
+
+    nameResult.value.push(beforeE + 'e' + afterE)
+  }
+
+  nameIsGenerated.value = true
+}
+
+const generationIsRandom = computed(() => {
+  const beforeEIsLimited = nameOptionsFormValue.beforeE.limited
+  const afterEIsLimited = nameOptionsFormValue.afterE.limited
+  return (
+    beforeEIsLimited ||
+    nameOptionsFormValue.afterE.customizedNum === '' ||
+    (beforeEIsLimited && !afterEIsLimited)
+  )
+})
+
+const handleGenerateButtonClick = async (nameOptionsFormEl: FormInstance | undefined) => {
+  if (!nameOptionsFormEl) return
+  try {
+    if (await nameOptionsFormEl.validate()) {
+      triggerGeneration()
+    }
+  } catch (e) {
+    ElMessage({
+      message: (e as Error).message,
+      type: 'error',
+    })
+  }
+}
+
+const handleCopyNames = async () => {
+  try {
+    await navigator.clipboard.writeText(nameResult.value.join(' '))
+    ElMessage({
+      message: `已将 ${nameResult.value.length} 个名字全部复制到剪贴板！`,
+      type: 'success',
+    })
+  } catch (e) {
+    ElMessage({
+      message: `复制失败：${(e as Error).message}`,
+      type: 'error',
+    })
+  }
 }
 </script>
 
@@ -149,32 +199,21 @@ const triggerGeneration = () => {
       "...e308" 式名字
     </template>
     <el-card>
-      <el-row>
-        <el-col :span="12">
-          <h3>样式预览</h3>
-          <p class="name-style-preview">{{ nameStylePreview }}</p>
-        </el-col>
-        <el-col :span="12">
-          <h3>结果</h3>
-          <p class="name-result">{{ nameResult }}</p>
-          <el-button type="primary" @click="triggerGeneration()">生成</el-button>
-        </el-col>
-      </el-row>
+      <h2>样式预览</h2>
+      <p class="name-style-preview">{{ nameStylePreview }}</p>
       <el-divider />
       <h2>名字选项</h2>
+      <p><i>PS：这里“限制”某一部分意味着这一部分名字不能自己取.</i></p>
       <el-form
         :model="nameOptionsFormValue"
-        :ref="nameOptionsFormRef"
+        ref="nameOptionsFormRef"
         :rules="nameOptionsFormRules"
+        label-position="top"
       >
         <!-- Limit first -->
         <el-form-item label="取名限制">
-          <el-form-item label="限制 e 前部分" prop="beforeE.limited">
-            <el-switch v-model="nameOptionsFormValue.beforeE.limited" />
-          </el-form-item>
-          <el-form-item label="限制 e 后部分" prop="afterE.limited">
-            <el-switch v-model="nameOptionsFormValue.afterE.limited" />
-          </el-form-item>
+          <el-checkbox v-model="nameOptionsFormValue.beforeE.limited" label="限制 e 前部分" />
+          <el-checkbox v-model="nameOptionsFormValue.afterE.limited" label="限制 e 后部分" />
         </el-form-item>
         <!-- Then, handle 2 parts -->
         <!-- BeforeE first -->
@@ -190,7 +229,7 @@ const triggerGeneration = () => {
 
         <!-- Limited -->
         <el-form-item
-          label="e 前部分字母大小写选项"
+          label="e 前部分字母大小写选项（单击某一位置以在该位置启用大写）"
           prop="beforeE.uppercase"
           v-if="nameOptionsFormValue.beforeE.limited"
         >
@@ -218,7 +257,31 @@ const triggerGeneration = () => {
         >
           <el-input v-model="nameOptionsFormValue.afterE.customizedNum" placeholder="随机生成" />
         </el-form-item>
+
+        <!-- Bulk -->
+        <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）" prop="bulk">
+          <el-slider
+            v-model="nameOptionsFormValue.bulk"
+            :min="1"
+            :max="100"
+            show-input
+            :disabled="!generationIsRandom"
+          />
+        </el-form-item>
       </el-form>
+      <el-button @click="handleGenerateButtonClick(nameOptionsFormRef)" type="primary"
+        >生成</el-button
+      >
+      <el-divider />
+      <h2>结果{{ nameIsGenerated ? `（共 ${nameResult.length} 个）` : '' }}</h2>
+      <div>
+        <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
+        <div>
+          <el-space wrap>
+            <span v-for="name in nameResult" :key="name">{{ name }}</span>
+          </el-space>
+        </div>
+      </div>
     </el-card>
   </PageLayout>
 </template>
