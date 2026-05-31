@@ -87,6 +87,9 @@ const nameStylePreview = computed(() => {
   // rightPart part in return value
   const rightPart = nameOptionsFormValue.rightPart.limited ? '308' : '[任意三位数字]'
 
+  if (reverse2Parts.value) {
+    return rightPart + 'e' + leftPart
+  }
   return leftPart + 'e' + rightPart
 })
 
@@ -239,15 +242,15 @@ const handleClearResult = () => {
       >
         <!-- Limit first -->
         <el-form-item label="取名限制">
-          <el-checkbox v-model="nameOptionsFormValue.leftPart.limited" label="限制 e 前部分" />
-          <el-checkbox v-model="nameOptionsFormValue.rightPart.limited" label="限制 e 后部分" />
+          <el-checkbox v-model="nameOptionsFormValue.leftPart.limited" label="限制前半部分" />
+          <el-checkbox v-model="nameOptionsFormValue.rightPart.limited" label="限制后半部分" />
         </el-form-item>
         <!-- Then, handle 2 parts -->
         <!-- leftPart first -->
 
         <!-- Unlimited -->
         <el-form-item
-          label="e 前部分（3 个字符）"
+          label="前半部分（3 个字符）"
           prop="leftPart.customizedText"
           v-if="!nameOptionsFormValue.leftPart.limited"
         >
@@ -256,7 +259,7 @@ const handleClearResult = () => {
 
         <!-- Limited -->
         <el-form-item
-          label="e 前部分字母大小写选项（单击某一位置以在该位置启用大写）"
+          label="前半部分字母大小写选项（单击某一位置以在该位置启用大写）"
           v-if="nameOptionsFormValue.leftPart.limited"
         >
           <el-checkbox-group v-model="nameOptionsFormValue.leftPart.uppercase">
@@ -277,7 +280,7 @@ const handleClearResult = () => {
         <!-- Then rightPart -->
         <!-- Unlimited only -->
         <el-form-item
-          label="e 后部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
+          label="后半部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
           prop="rightPart.customizedNum"
           v-if="!nameOptionsFormValue.rightPart.limited"
         >
