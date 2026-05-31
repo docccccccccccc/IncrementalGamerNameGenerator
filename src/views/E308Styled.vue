@@ -211,13 +211,10 @@ const filteredResult = computed(() => {
 })
 
 const handleClearResult = () => {
-  ElMessageBox.alert('确定要清空结果列表吗？此操作不可逆！', '危险操作', {
-    confirmButtonText: 'OK',
-    callback: () => {
-      nameResult.value = []
-      currentResultPageNum.value = 1
-      searchingKeyword.value = ''
-    },
+  ElMessageBox.confirm('确定要清空结果列表吗？此操作不可逆！', '危险操作').then(() => {
+    nameResult.value = []
+    currentResultPageNum.value = 1
+    searchingKeyword.value = ''
   })
 }
 </script>
