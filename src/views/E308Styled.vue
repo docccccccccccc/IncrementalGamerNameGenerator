@@ -2,16 +2,8 @@
 import PageLayout from '@/components/PageLayout.vue'
 import NameResult from '@/components/NameResult.vue'
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { initAntiDebug, destroyAntiDebug } from '@/utils/antiDebug'
-onMounted(() => {
-  initAntiDebug()
-})
-
-onUnmounted(() => {
-  destroyAntiDebug()
-})
 
 const router = useRouter()
 
@@ -131,7 +123,7 @@ const triggerGeneration = () => {
     return result
   }
 
-  const nameAmount = generationIsRandom.value ? nameOptionsFormValue.bulkValue : 1
+  const nameAmount = (() => (generationIsRandom.value ? nameOptionsFormValue.bulkValue : 1))()
 
   for (let i = 0; i < Math.min(nameAmount, 10000); i++) {
     const beforeE = nameOptionsFormValue.beforeE.limited
@@ -146,6 +138,8 @@ const triggerGeneration = () => {
 
     nameResult.value.push(beforeE + 'e' + afterE)
   }
+
+  currentResultPageNum.value = 1
 
   nameIsGenerated.value = true
 }
