@@ -3,7 +3,7 @@
   <div>增量玩家名字生成器</div>
 </h1>
 
-![Version](https://img.shields.io/static/v1?label=Version&message=0.1.0&color=blue)
+![Version](https://img.shields.io/static/v1?label=Version&message=1.0.0&color=blue)
 [![License](https://img.shields.io/static/v1?label=License&message=MIT&color=green)](./LICENSE.txt)
 ![Creator](https://img.shields.io/static/v1?label=Creator&message=doctypehtml&color=red)
 
@@ -66,9 +66,8 @@ incremental-gamer-name-generator/
 ├─ src/               源代码
 │  ├─ App.vue         根组件
 │  ├─ components/     页面内组件
-│  ├─ main.ts/        项目入口文件
+│  ├─ main.ts         项目入口文件
 │  ├─ router/         路由
-│  ├─ utils/          小功能
 │  ├─ styles/         页面样式
 │  └─ views/          子页面
 ├─ tsconfig.app.json  TypeScript 配置
