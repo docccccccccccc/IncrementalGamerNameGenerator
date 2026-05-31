@@ -25,7 +25,7 @@ interface nameOptionsForm {
     limited: boolean
     customizedNum: string // For leading 0 =)
   }
-  bulk: number
+  bulkValue: number
 }
 
 const nameOptionsFormValue = reactive<nameOptionsForm>({
@@ -38,7 +38,7 @@ const nameOptionsFormValue = reactive<nameOptionsForm>({
     limited: true,
     customizedNum: '308',
   },
-  bulk: 1,
+  bulkValue: 0,
 })
 
 const nameOptionsFormRef = ref<FormInstance>()
@@ -98,7 +98,7 @@ const nameStylePreview = computed(() => {
   return beforeE + 'e' + afterE
 })
 
-const nameResult = ref<string[]>(['[无]'])
+const nameResult = ref<string[]>([])
 
 const nameIsGenerated = ref<boolean>(false)
 
@@ -131,7 +131,7 @@ const triggerGeneration = () => {
     return result
   }
 
-  const nameAmount = generationIsRandom.value ? nameOptionsFormValue.bulk : 1
+  const nameAmount = generationIsRandom.value ? nameOptionsFormValue.bulkValue : 1
 
   for (let i = 0; i < Math.min(nameAmount, 10000); i++) {
     const beforeE = nameOptionsFormValue.beforeE.limited
@@ -188,6 +188,14 @@ const handleCopyNames = async () => {
     })
   }
 }
+
+const currentResultPageNum = ref(1)
+
+const slicedResult = computed(() => {
+  const firstOneIndex = (currentResultPageNum.value - 1) * 100
+  const lastOneIndex = firstOneIndex + 100
+  return nameResult.value.slice(firstOneIndex, lastOneIndex)
+})
 </script>
 
 <template>
@@ -257,11 +265,10 @@ const handleCopyNames = async () => {
 
         <!-- Bulk -->
         <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）">
-          <el-slider
-            v-model="nameOptionsFormValue.bulk"
+          <el-input-number
+            v-model="nameOptionsFormValue.bulkValue"
             :min="1"
             :max="10000"
-            show-input
             :disabled="!generationIsRandom"
           />
         </el-form-item>
@@ -281,8 +288,16 @@ const handleCopyNames = async () => {
               justifyContent: 'center',
             }"
           >
-            <NameResult v-for="name in nameResult" :key="name" :name="name" />
+            <NameResult v-for="name in slicedResult" :key="name" :name="name" />
           </el-space>
+          <el-pagination
+            hide-on-single-page
+            layout="prev, pager, next"
+            :total="nameResult.length"
+            :page-size="100"
+            v-model:current-page="currentResultPageNum"
+            style="justify-content: center"
+          />
         </div>
       </div>
     </el-card>
