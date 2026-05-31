@@ -14,6 +14,7 @@ const router = useRouter()
     <div>
       <el-image src="/images/logo.png" />
       <h2>增量玩家名字生成器</h2>
+      <h4>V1.0.0</h4>
       <p>
         作者 GitHub 主页：
         <el-link href="https://github.com/docccccccccccc">docccccccccccc (doctypehtml)</el-link>

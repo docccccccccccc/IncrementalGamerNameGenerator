@@ -26,6 +26,9 @@ const direction = computed(() => {
 <template>
   <PageLayout>
     <template #header>增量玩家名字生成器</template>
+    <h3 style="color: red">
+      声明：不喜欢请直接离开，按一下标签页旁边的关闭按钮，然后就当这个项目不存在.
+    </h3>
     <el-space
       :fill="useVerticalLayout"
       wrap
