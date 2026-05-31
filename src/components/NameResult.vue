@@ -23,9 +23,7 @@ const handleCopyOneName = async () => {
 
 <template>
   <span @click="handleCopyOneName" class="name-result-item">
-    <el-tooltip content="点我复制" placement="top" :enterable="false">
-      {{ name }}
-    </el-tooltip>
+    {{ name }}
   </span>
 </template>
 
