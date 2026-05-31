@@ -229,119 +229,128 @@ const handleClearResult = () => {
       "...e308" 式名字
     </template>
     <el-card>
-      <h2>样式预览</h2>
-      <p class="name-style-preview">{{ nameStylePreview }}</p>
-      <el-divider />
-      <h2>名字选项</h2>
-      <p><i>PS：这里“限制”某一部分意味着这一部分名字不能自己取.</i></p>
-      <el-form
-        :model="nameOptionsFormValue"
-        ref="nameOptionsFormRef"
-        :rules="nameOptionsFormRules"
-        label-position="top"
-      >
-        <!-- Limit first -->
-        <el-form-item label="取名限制">
-          <el-checkbox v-model="nameOptionsFormValue.leftPart.limited" label="限制前半部分" />
-          <el-checkbox v-model="nameOptionsFormValue.rightPart.limited" label="限制后半部分" />
-        </el-form-item>
-        <!-- Then, handle 2 parts -->
-        <!-- leftPart first -->
-
-        <!-- Unlimited -->
-        <el-form-item
-          label="前半部分（3 个字符）"
-          prop="leftPart.customizedText"
-          v-if="!nameOptionsFormValue.leftPart.limited"
-        >
-          <el-input v-model="nameOptionsFormValue.leftPart.customizedText" />
-        </el-form-item>
-
-        <!-- Limited -->
-        <el-form-item
-          label="前半部分字母大小写选项（单击某一位置以在该位置启用大写）"
-          v-if="nameOptionsFormValue.leftPart.limited"
-        >
-          <el-checkbox-group v-model="nameOptionsFormValue.leftPart.uppercase">
-            <el-checkbox-button
-              :value="checkboxBtn"
-              v-for="checkboxBtn in 'ABC'"
-              :key="checkboxBtn"
-            >
-              {{
-                nameOptionsFormValue.leftPart.uppercase.includes(checkboxBtn)
-                  ? checkboxBtn
-                  : checkboxBtn.toLowerCase()
-              }}
-            </el-checkbox-button>
-          </el-checkbox-group>
-        </el-form-item>
-
-        <!-- Then rightPart -->
-        <!-- Unlimited only -->
-        <el-form-item
-          label="后半部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
-          prop="rightPart.customizedNum"
-          v-if="!nameOptionsFormValue.rightPart.limited"
-        >
-          <el-input v-model="nameOptionsFormValue.rightPart.customizedNum" placeholder="随机生成" />
-        </el-form-item>
-
-        <!-- Bulk -->
-        <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）">
-          <el-input-number
-            v-model="nameOptionsFormValue.bulkValue"
-            :min="1"
-            :max="10000"
-            :disabled="!generationIsRandom"
-          />
-        </el-form-item>
-
-        <!-- Reverse -->
-        <el-form-item label="反转名字左右部分">
-          <el-switch v-model="reverse2Parts" />
-        </el-form-item>
-      </el-form>
-      <el-button @click="handleGenerateButtonClick(nameOptionsFormRef)" type="primary"
-        >生成</el-button
-      >
-      <el-divider />
-      <h2>
-        结果
-        <template v-if="nameIsGenerated">
-          （{{ filteredResult.length }}/{{ nameResult.length }} 个）
-        </template>
-      </h2>
       <div>
-        <p><i>点击其中一个名字以复制.</i></p>
-        <el-space class="toolbar">
-          <el-input placeholder="搜索" v-model="searchingKeyword">
-            <template #prefix>
-              <el-icon class="el-input__icon"><search /></el-icon>
-            </template>
-          </el-input>
-          <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
-          <el-button :disabled="!nameIsGenerated" @click="handleClearResult" type="danger">
-            清空结果
-          </el-button>
-        </el-space>
-        <div>
-          <el-space
-            wrap
-            :style="{
-              justifyContent: 'center',
-            }"
+        <h2>样式预览</h2>
+        <p class="name-style-preview">{{ nameStylePreview }}</p>
+      </div>
+      <el-divider />
+      <div>
+        <h2>名字选项</h2>
+        <p><i>PS：这里“限制”某一部分意味着这一部分名字不能自己取.</i></p>
+        <el-form
+          :model="nameOptionsFormValue"
+          ref="nameOptionsFormRef"
+          :rules="nameOptionsFormRules"
+          label-position="top"
+        >
+          <!-- Limit first -->
+          <el-form-item label="取名限制">
+            <el-checkbox v-model="nameOptionsFormValue.leftPart.limited" label="限制前半部分" />
+            <el-checkbox v-model="nameOptionsFormValue.rightPart.limited" label="限制后半部分" />
+          </el-form-item>
+          <!-- Then, handle 2 parts -->
+          <!-- leftPart first -->
+
+          <!-- Unlimited -->
+          <el-form-item
+            label="前半部分（3 个字符）"
+            prop="leftPart.customizedText"
+            v-if="!nameOptionsFormValue.leftPart.limited"
           >
-            <NameResult v-for="name in slicedResult" :key="name" :name="name" />
+            <el-input v-model="nameOptionsFormValue.leftPart.customizedText" />
+          </el-form-item>
+
+          <!-- Limited -->
+          <el-form-item
+            label="前半部分字母大小写选项（单击某一位置以在该位置启用大写）"
+            v-if="nameOptionsFormValue.leftPart.limited"
+          >
+            <el-checkbox-group v-model="nameOptionsFormValue.leftPart.uppercase">
+              <el-checkbox-button
+                :value="checkboxBtn"
+                v-for="checkboxBtn in 'ABC'"
+                :key="checkboxBtn"
+              >
+                {{
+                  nameOptionsFormValue.leftPart.uppercase.includes(checkboxBtn)
+                    ? checkboxBtn
+                    : checkboxBtn.toLowerCase()
+                }}
+              </el-checkbox-button>
+            </el-checkbox-group>
+          </el-form-item>
+
+          <!-- Then rightPart -->
+          <!-- Unlimited only -->
+          <el-form-item
+            label="后半部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
+            prop="rightPart.customizedNum"
+            v-if="!nameOptionsFormValue.rightPart.limited"
+          >
+            <el-input
+              v-model="nameOptionsFormValue.rightPart.customizedNum"
+              placeholder="随机生成"
+            />
+          </el-form-item>
+
+          <!-- Bulk -->
+          <el-form-item label="批量生成数量（名字某一部分可随机生成时启用）">
+            <el-input-number
+              v-model="nameOptionsFormValue.bulkValue"
+              :min="1"
+              :max="10000"
+              :disabled="!generationIsRandom"
+            />
+          </el-form-item>
+
+          <!-- Reverse -->
+          <el-form-item label="反转名字左右部分">
+            <el-switch v-model="reverse2Parts" />
+          </el-form-item>
+        </el-form>
+        <el-button @click="handleGenerateButtonClick(nameOptionsFormRef)" type="primary"
+          >生成</el-button
+        >
+      </div>
+      <el-divider />
+      <div>
+        <h2>
+          结果
+          <template v-if="nameIsGenerated">
+            （{{ filteredResult.length }}/{{ nameResult.length }} 个）
+          </template>
+        </h2>
+        <div>
+          <p><i>点击其中一个名字以复制.</i></p>
+          <el-space class="toolbar">
+            <el-input placeholder="搜索" v-model="searchingKeyword">
+              <template #prefix>
+                <el-icon class="el-input__icon"><search /></el-icon>
+              </template>
+            </el-input>
+            <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
+            <el-button :disabled="!nameIsGenerated" @click="handleClearResult" type="danger">
+              清空结果
+            </el-button>
           </el-space>
-          <el-pagination
-            hide-on-single-page
-            layout="prev, pager, next"
-            :total="filteredResult.length"
-            :page-size="100"
-            v-model:current-page="currentResultPageNum"
-            style="justify-content: center"
-          />
+          <div>
+            <el-space
+              wrap
+              :style="{
+                justifyContent: 'center',
+              }"
+            >
+              <NameResult v-for="name in slicedResult" :key="name" :name="name" />
+            </el-space>
+            <el-pagination
+              hide-on-single-page
+              layout="prev, pager, next"
+              :total="filteredResult.length"
+              :page-size="100"
+              v-model:current-page="currentResultPageNum"
+              style="justify-content: center"
+            />
+          </div>
         </div>
       </div>
     </el-card>
