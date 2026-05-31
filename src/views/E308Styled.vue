@@ -58,7 +58,7 @@ const checkCustomizedNum = (rule: any, value: string, callback: any) => {
   if (!value.split('').every((char: string) => isNumberChar(char))) {
     callback(new Error('输入的内容不是数字（或者你输入了其他的数字字符）'))
   } else if (!(value.length === 3) && !(value.length === 0)) {
-    callback(new Error('输入的内容必须为 3 个字符，或者留空'))
+    callback(new Error('输入的内容必须为 3 个数字字符，或者留空'))
   } else {
     callback()
   }
@@ -157,7 +157,7 @@ const generationIsRandom = computed(() => {
   const rightPartIsLimited = nameOptionsFormValue.rightPart.limited
   return (
     leftPartIsLimited ||
-    nameOptionsFormValue.rightPart.customizedNum === '' ||
+    (nameOptionsFormValue.rightPart.customizedNum === '' && !rightPartIsLimited) ||
     (leftPartIsLimited && !rightPartIsLimited)
   )
 })
@@ -283,7 +283,7 @@ const handleClearResult = () => {
           <!-- Then rightPart -->
           <!-- Unlimited only -->
           <el-form-item
-            label="后半部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
+            label="后半部分（仅允许 3 个数字字符，留空以随机生成）"
             prop="rightPart.customizedNum"
             v-if="!nameOptionsFormValue.rightPart.limited"
           >
