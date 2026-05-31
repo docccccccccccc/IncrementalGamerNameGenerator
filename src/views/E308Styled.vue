@@ -48,19 +48,6 @@ const checkCustomizedText = (rule: any, value: string, callback: any) => {
   if (!value) {
     callback(new Error('此处不能为空'))
   } else {
-    function isEnglishLetter(char: string) {
-      // I can't memorize ASCII well so far
-      const charCode = char.charCodeAt(0)
-      const isUppercase = charCode >= 65 && charCode <= 90
-      const isLowercase = charCode >= 97 && charCode <= 122
-      return isUppercase || isLowercase
-    }
-
-    // English letter
-    if (!value.split('').every((char: string) => isEnglishLetter(char))) {
-      callback(new Error('输入的内容不是英文字母'))
-    }
-
     if (!(value.length === 3)) {
       callback(new Error('输入的内容必须为 3 个字符'))
     }
@@ -230,7 +217,7 @@ const handleCopyNames = async () => {
 
         <!-- Unlimited -->
         <el-form-item
-          label="e 前部分（仅允许字母）"
+          label="e 前部分（3 个字符）"
           prop="beforeE.customizedText"
           v-if="!nameOptionsFormValue.beforeE.limited"
         >
