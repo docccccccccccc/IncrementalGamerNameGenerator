@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PageLayout from '@/components/PageLayout.vue'
+import NameResult from '@/components/NameResult.vue'
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -132,7 +133,7 @@ const triggerGeneration = () => {
 
   const nameAmount = generationIsRandom.value ? nameOptionsFormValue.bulk : 1
 
-  for (let i = 0; i < nameAmount; i++) {
+  for (let i = 0; i < Math.min(nameAmount, 10000); i++) {
     const beforeE = nameOptionsFormValue.beforeE.limited
       ? generateBeforeE()
       : nameOptionsFormValue.beforeE.customizedText
@@ -259,7 +260,7 @@ const handleCopyNames = async () => {
           <el-slider
             v-model="nameOptionsFormValue.bulk"
             :min="1"
-            :max="100"
+            :max="10000"
             show-input
             :disabled="!generationIsRandom"
           />
@@ -271,6 +272,7 @@ const handleCopyNames = async () => {
       <el-divider />
       <h2>结果{{ nameIsGenerated ? `（共 ${nameResult.length} 个）` : '' }}</h2>
       <div>
+        <p><i>点击其中一个名字以复制.</i></p>
         <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
         <div>
           <el-space
@@ -279,7 +281,7 @@ const handleCopyNames = async () => {
               justifyContent: 'center',
             }"
           >
-            <span v-for="name in nameResult" :key="name">{{ name }}</span>
+            <NameResult v-for="name in nameResult" :key="name" :name="name" />
           </el-space>
         </div>
       </div>
