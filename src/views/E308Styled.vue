@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import PageLayout from '@/components/PageLayout.vue'
 import NameResult from '@/components/NameResult.vue'
-import { type FormRules, type FormInstance, ElMessage } from 'element-plus'
+import { type FormRules, type FormInstance, ElMessage, ElMessageBox } from 'element-plus'
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 interface nameOptionsForm {
-  beforeE: {
+  leftPart: {
     limited: boolean
     customizedText: string
     uppercase: string[]
   }
-  afterE: {
+  rightPart: {
     limited: boolean
     customizedNum: string // For leading 0 =)
   }
@@ -21,12 +21,12 @@ interface nameOptionsForm {
 }
 
 const nameOptionsFormValue = reactive<nameOptionsForm>({
-  beforeE: {
+  leftPart: {
     limited: true,
     customizedText: 'AbC',
     uppercase: ['A', 'C'],
   },
-  afterE: {
+  rightPart: {
     limited: true,
     customizedNum: '308',
   },
@@ -66,28 +66,28 @@ const checkCustomizedNum = (rule: any, value: string, callback: any) => {
 
 /* eslint-enable @typescript-eslint/no-explicit-any */
 const nameOptionsFormRules = reactive<FormRules<nameOptionsForm>>({
-  'beforeE.customizedText': [{ validator: checkCustomizedText, trigger: 'blur' }],
-  'afterE.customizedNum': [{ validator: checkCustomizedNum, trigger: 'blur' }],
+  'leftPart.customizedText': [{ validator: checkCustomizedText, trigger: 'blur' }],
+  'rightPart.customizedNum': [{ validator: checkCustomizedNum, trigger: 'blur' }],
 })
 
 const nameStylePreview = computed(() => {
   // Return 'Any' if both are unlimited
-  if (!(nameOptionsFormValue.beforeE.limited || nameOptionsFormValue.afterE.limited)) {
+  if (!(nameOptionsFormValue.leftPart.limited || nameOptionsFormValue.rightPart.limited)) {
     return '[任意]'
   }
 
-  const uppercase = nameOptionsFormValue.beforeE.uppercase
+  const uppercase = nameOptionsFormValue.leftPart.uppercase
 
-  // BeforeE part in return value
-  const beforeE = nameOptionsFormValue.beforeE.limited
+  // leftPart part in return value
+  const leftPart = nameOptionsFormValue.leftPart.limited
     ? (uppercase.includes('A') ? 'A' : 'a') +
       (uppercase.includes('B') ? 'B' : 'b') +
       (uppercase.includes('C') ? 'C' : 'c')
     : '[任意三个字母]'
-  // AfterE part in return value
-  const afterE = nameOptionsFormValue.afterE.limited ? '308' : '[任意三位数字]'
+  // rightPart part in return value
+  const rightPart = nameOptionsFormValue.rightPart.limited ? '308' : '[任意三位数字]'
 
-  return beforeE + 'e' + afterE
+  return leftPart + 'e' + rightPart
 })
 
 const nameResult = ref<string[]>([])
@@ -96,12 +96,12 @@ const nameIsGenerated = ref<boolean>(false)
 
 const triggerGeneration = () => {
   nameResult.value = []
-  function generateBeforeE(): string {
+  function generateleftPart(): string {
     let result: string = ''
     for (let i = 0; i < 3; i++) {
       // wtf
       // Get cases for every characters
-      const uppercase = nameOptionsFormValue.beforeE.uppercase
+      const uppercase = nameOptionsFormValue.leftPart.uppercase
       // Then convert to boolean
       const useUppercase: boolean[] = [
         uppercase.includes('A'),
@@ -115,7 +115,7 @@ const triggerGeneration = () => {
     return result
   }
 
-  function generateAfterE(): string {
+  function generaterightPart(): string {
     let result: string = ''
     for (let i = 0; i < 3; i++) {
       result += String.fromCharCode(Math.floor(48 + Math.random() * 10))
@@ -126,31 +126,36 @@ const triggerGeneration = () => {
   const nameAmount = (() => (generationIsRandom.value ? nameOptionsFormValue.bulkValue : 1))()
 
   for (let i = 0; i < Math.min(nameAmount, 10000); i++) {
-    const beforeE = nameOptionsFormValue.beforeE.limited
-      ? generateBeforeE()
-      : nameOptionsFormValue.beforeE.customizedText
+    const leftPart = nameOptionsFormValue.leftPart.limited
+      ? generateleftPart()
+      : nameOptionsFormValue.leftPart.customizedText
 
-    const afterE = nameOptionsFormValue.afterE.limited
+    const rightPart = nameOptionsFormValue.rightPart.limited
       ? '308'
-      : nameOptionsFormValue.afterE.customizedNum === ''
-        ? generateAfterE() // Random generate if empty
-        : nameOptionsFormValue.afterE.customizedNum
+      : nameOptionsFormValue.rightPart.customizedNum === ''
+        ? generaterightPart() // Random generate if empty
+        : nameOptionsFormValue.rightPart.customizedNum
 
-    nameResult.value.push(beforeE + 'e' + afterE)
+    if (reverse2Parts.value) {
+      nameResult.value.push(rightPart + 'e' + leftPart)
+    } else {
+      nameResult.value.push(leftPart + 'e' + rightPart)
+    }
   }
 
   currentResultPageNum.value = 1
+  searchingKeyword.value = ''
 
   nameIsGenerated.value = true
 }
 
 const generationIsRandom = computed(() => {
-  const beforeEIsLimited = nameOptionsFormValue.beforeE.limited
-  const afterEIsLimited = nameOptionsFormValue.afterE.limited
+  const leftPartIsLimited = nameOptionsFormValue.leftPart.limited
+  const rightPartIsLimited = nameOptionsFormValue.rightPart.limited
   return (
-    beforeEIsLimited ||
-    nameOptionsFormValue.afterE.customizedNum === '' ||
-    (beforeEIsLimited && !afterEIsLimited)
+    leftPartIsLimited ||
+    nameOptionsFormValue.rightPart.customizedNum === '' ||
+    (leftPartIsLimited && !rightPartIsLimited)
   )
 })
 
@@ -188,8 +193,30 @@ const currentResultPageNum = ref(1)
 const slicedResult = computed(() => {
   const firstOneIndex = (currentResultPageNum.value - 1) * 100
   const lastOneIndex = firstOneIndex + 100
-  return nameResult.value.slice(firstOneIndex, lastOneIndex)
+  return filteredResult.value.slice(firstOneIndex, lastOneIndex)
 })
+
+const reverse2Parts = ref<boolean>(false)
+
+const searchingKeyword = ref<string>('')
+
+const filteredResult = computed(() => {
+  if (searchingKeyword.value !== '') {
+    return nameResult.value.filter((result) => result.includes(searchingKeyword.value))
+  }
+  return nameResult.value
+})
+
+const handleClearResult = () => {
+  ElMessageBox.alert('确定要清空结果列表吗？此操作不可逆！', '危险操作', {
+    confirmButtonText: 'OK',
+    callback: () => {
+      nameResult.value = []
+      currentResultPageNum.value = 1
+      searchingKeyword.value = ''
+    },
+  })
+}
 </script>
 
 <template>
@@ -212,34 +239,34 @@ const slicedResult = computed(() => {
       >
         <!-- Limit first -->
         <el-form-item label="取名限制">
-          <el-checkbox v-model="nameOptionsFormValue.beforeE.limited" label="限制 e 前部分" />
-          <el-checkbox v-model="nameOptionsFormValue.afterE.limited" label="限制 e 后部分" />
+          <el-checkbox v-model="nameOptionsFormValue.leftPart.limited" label="限制 e 前部分" />
+          <el-checkbox v-model="nameOptionsFormValue.rightPart.limited" label="限制 e 后部分" />
         </el-form-item>
         <!-- Then, handle 2 parts -->
-        <!-- BeforeE first -->
+        <!-- leftPart first -->
 
         <!-- Unlimited -->
         <el-form-item
           label="e 前部分（3 个字符）"
-          prop="beforeE.customizedText"
-          v-if="!nameOptionsFormValue.beforeE.limited"
+          prop="leftPart.customizedText"
+          v-if="!nameOptionsFormValue.leftPart.limited"
         >
-          <el-input v-model="nameOptionsFormValue.beforeE.customizedText" />
+          <el-input v-model="nameOptionsFormValue.leftPart.customizedText" />
         </el-form-item>
 
         <!-- Limited -->
         <el-form-item
           label="e 前部分字母大小写选项（单击某一位置以在该位置启用大写）"
-          v-if="nameOptionsFormValue.beforeE.limited"
+          v-if="nameOptionsFormValue.leftPart.limited"
         >
-          <el-checkbox-group v-model="nameOptionsFormValue.beforeE.uppercase">
+          <el-checkbox-group v-model="nameOptionsFormValue.leftPart.uppercase">
             <el-checkbox-button
               :value="checkboxBtn"
               v-for="checkboxBtn in 'ABC'"
               :key="checkboxBtn"
             >
               {{
-                nameOptionsFormValue.beforeE.uppercase.includes(checkboxBtn)
+                nameOptionsFormValue.leftPart.uppercase.includes(checkboxBtn)
                   ? checkboxBtn
                   : checkboxBtn.toLowerCase()
               }}
@@ -247,14 +274,14 @@ const slicedResult = computed(() => {
           </el-checkbox-group>
         </el-form-item>
 
-        <!-- Then AfterE -->
+        <!-- Then rightPart -->
         <!-- Unlimited only -->
         <el-form-item
           label="e 后部分（仅允许 000 - 999）内的 3 位数字（留空以随机生成）"
-          prop="afterE.customizedNum"
-          v-if="!nameOptionsFormValue.afterE.limited"
+          prop="rightPart.customizedNum"
+          v-if="!nameOptionsFormValue.rightPart.limited"
         >
-          <el-input v-model="nameOptionsFormValue.afterE.customizedNum" placeholder="随机生成" />
+          <el-input v-model="nameOptionsFormValue.rightPart.customizedNum" placeholder="随机生成" />
         </el-form-item>
 
         <!-- Bulk -->
@@ -266,15 +293,35 @@ const slicedResult = computed(() => {
             :disabled="!generationIsRandom"
           />
         </el-form-item>
+
+        <!-- Reverse -->
+        <el-form-item label="反转名字左右部分">
+          <el-switch v-model="reverse2Parts" />
+        </el-form-item>
       </el-form>
       <el-button @click="handleGenerateButtonClick(nameOptionsFormRef)" type="primary"
         >生成</el-button
       >
       <el-divider />
-      <h2>结果{{ nameIsGenerated ? `（共 ${nameResult.length} 个）` : '' }}</h2>
+      <h2>
+        结果
+        <template v-if="nameIsGenerated">
+          （{{ filteredResult.length }}/{{ nameResult.length }} 个）
+        </template>
+      </h2>
       <div>
         <p><i>点击其中一个名字以复制.</i></p>
-        <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
+        <el-space class="toolbar">
+          <el-input placeholder="搜索" v-model="searchingKeyword">
+            <template #prefix>
+              <el-icon class="el-input__icon"><search /></el-icon>
+            </template>
+          </el-input>
+          <el-button :disabled="!nameIsGenerated" @click="handleCopyNames">复制全部</el-button>
+          <el-button :disabled="!nameIsGenerated" @click="handleClearResult" type="danger">
+            清空结果
+          </el-button>
+        </el-space>
         <div>
           <el-space
             wrap
@@ -287,7 +334,7 @@ const slicedResult = computed(() => {
           <el-pagination
             hide-on-single-page
             layout="prev, pager, next"
-            :total="nameResult.length"
+            :total="filteredResult.length"
             :page-size="100"
             v-model:current-page="currentResultPageNum"
             style="justify-content: center"
